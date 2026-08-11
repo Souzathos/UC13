@@ -1,4 +1,5 @@
 import { AppDataSource } from "../config/dataSource";
+import { BadRequestError, NotFoundError } from "../errors";
 import { Category } from "../models/Category";
 
 export class CategoryService {
@@ -14,14 +15,14 @@ export class CategoryService {
         const category = await this.repo.findOneBy({ id });
 
         if (!category) {
-            throw new Error('Category not found');
+            throw new NotFoundError('Category not found');
         }
 
         return category;
     }
 
     async create(name: string) {
-        if (!name) throw new Error('Nome é obrigatorio');
+        if (!name) throw new BadRequestError('Nome é obrigatorio');
 
         const category = this.repo.create({ name });
 
@@ -32,7 +33,7 @@ export class CategoryService {
         const category = await this.repo.findOneBy({ id });
 
         if (!category) {
-            throw new Error('Category not found');
+            throw new NotFoundError('Category not found');
         }
 
         if (name) {
@@ -49,11 +50,11 @@ export class CategoryService {
         });
 
         if (!category) {
-            throw new Error('Category not found');
+            throw new NotFoundError('Category not found');
         }
 
         if (category.products.length > 0) {
-            throw new Error('Cannot delete category with linked products');
+            throw new BadRequestError('Cannot delete category with linked products');
         }
 
         await this.repo.remove(category);

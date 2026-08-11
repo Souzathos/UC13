@@ -1,4 +1,5 @@
 import { AppDataSource } from '../config/dataSource';
+import { BadRequestError, NotFoundError } from '../errors';
 import { Post } from '../models/Post';
 import { User } from '../models/User';
 
@@ -20,7 +21,7 @@ export class PostService {
         });
 
         if (!post) {
-            throw new Error('Post not found');
+            throw new NotFoundError('Post not found');
         }
 
         return post;
@@ -28,13 +29,13 @@ export class PostService {
 
     async create(title: string, userId: number) {
         if (!title || !userId) {
-            throw new Error('Title and userId are required');
+            throw new BadRequestError('Title and userId are required');
         }
 
         const user = await userRepository.findOneBy({ id: userId });
 
         if (!user) {
-            throw new Error('User not found');
+            throw new NotFoundError('User not found');
         }
 
         const post = postRepository.create({
@@ -51,7 +52,7 @@ export class PostService {
         const post = await postRepository.findOneBy({ id });
 
         if (!post) {
-            throw new Error('Post not found');
+            throw new NotFoundError('Post not found');
         }
 
         if (title) {
@@ -62,7 +63,7 @@ export class PostService {
             const user = await userRepository.findOneBy({ id: userId });
 
             if (!user) {
-                throw new Error('User not found');
+                throw new NotFoundError('User not found');
             }
 
             post.user = user;
@@ -77,7 +78,7 @@ export class PostService {
         const post = await postRepository.findOneBy({ id });
 
         if (!post) {
-            throw new Error('Post not found');
+            throw new NotFoundError('Post not found');
         }
 
         await postRepository.remove(post);

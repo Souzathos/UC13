@@ -1,4 +1,5 @@
 import { AppDataSource } from '../config/dataSource';
+import { BadRequestError, NotFoundError } from '../errors';
 import { User } from '../models/User';
 
 const userRepository = AppDataSource.getRepository(User);
@@ -20,7 +21,7 @@ export class UserService {
         });
 
         if (!user) {
-            throw new Error('User not found');
+            throw new NotFoundError('User not found');
         }
 
         return user;
@@ -28,13 +29,13 @@ export class UserService {
 
     async create(name: string, email: string) {
         if (!name || !email) {
-            throw new Error('Name and email are required');
+            throw new BadRequestError('Name and email are required');
         }
 
         const exists = await userRepository.findOneBy({ email });
 
         if (exists) {
-            throw new Error('Email already in use');
+            throw new BadRequestError('Email already in use');
         }
 
         const user = userRepository.create({
@@ -51,7 +52,7 @@ export class UserService {
         const user = await userRepository.findOneBy({ id });
 
         if (!user) {
-            throw new Error('User not found');
+            throw new NotFoundError('User not found');
         }
 
         if (name) {
@@ -62,7 +63,7 @@ export class UserService {
             const exists = await userRepository.findOneBy({ email });
 
             if (exists && exists.id !== user.id) {
-                throw new Error('Email already in use');
+                throw new BadRequestError('Email already in use');
             }
 
             user.email = email;
@@ -77,7 +78,7 @@ export class UserService {
         const user = await userRepository.findOneBy({ id });
 
         if (!user) {
-            throw new Error('User not found');
+            throw new NotFoundError('User not found');
         }
 
         await userRepository.remove(user);

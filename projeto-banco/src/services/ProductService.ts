@@ -1,6 +1,7 @@
 import { AppDataSource } from "../config/dataSource";
 import { Product } from "../models/Product";
 import { Category } from "../models/Category";
+import { BadRequestError, NotFoundError } from "../errors";
 
 export class ProductService {
     private repo = AppDataSource.getRepository(Product)
@@ -20,7 +21,7 @@ export class ProductService {
         });
 
         if (!product) {
-            throw new Error('Product not found');
+            throw new NotFoundError('Product not found');
         }
 
         return product;
@@ -28,13 +29,13 @@ export class ProductService {
 
     async create(name: string, description: string, categoryId: number) {
         if (!name || !description || !categoryId) {
-            throw new Error('Name, description and categoryId are required');
+            throw new BadRequestError('Name, description and categoryId are required');
         }
 
         const category = await this.categoryRepo.findOneBy({ id: categoryId });
 
         if (!category) {
-            throw new Error('Category not found');
+            throw new NotFoundError('Category not found');
         }
 
         const product = this.repo.create({ name, description, category });
@@ -46,7 +47,7 @@ export class ProductService {
         const product = await this.repo.findOneBy({ id });
 
         if (!product) {
-            throw new Error('Product not found');
+            throw new NotFoundError('Product not found');
         }
 
         if (name) {
@@ -61,7 +62,7 @@ export class ProductService {
             const category = await this.categoryRepo.findOneBy({ id: categoryId });
 
             if (!category) {
-                throw new Error('Category not found');
+                throw new NotFoundError('Category not found');
             }
 
             product.category = category;
@@ -74,7 +75,7 @@ export class ProductService {
         const product = await this.repo.findOneBy({ id });
 
         if (!product) {
-            throw new Error('Product not found');
+            throw new NotFoundError('Product not found');
         }
 
         await this.repo.remove(product);
